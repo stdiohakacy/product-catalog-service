@@ -26,7 +26,7 @@ export class AddProductHandler
     const existed = await this.productRepository.findByName(command.name);
     if (existed.isErr()) return existed;
 
-    if (existed.unwrap()) {
+    if (existed.unwrap().isSome()) {
       return Err(
         new ConflictException(
           `Product with name '${command.name}' already exists.`,
