@@ -1,4 +1,4 @@
-import { UniqueEntityID } from '../../../../libs/domain/unique-entity-id';
+import { UniqueEntityID } from '@libs/domain/unique-entity-id';
 import { ProductCategory } from '../value-objects/product-category.vo';
 import { Product } from '../aggregates/product.aggregate';
 import { ProductReview } from '../value-objects/product-review.vo';
