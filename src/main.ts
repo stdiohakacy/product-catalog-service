@@ -8,6 +8,7 @@ import { useContainer, validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 import { AppEnvDto } from '@modules/app/dtos/app.env.dto';
 import { ENUM_APP_ENVIRONMENT } from '@modules/app/enums/app.enum';
+import swaggerInit from 'src/swagger';
 
 async function bootstrap() {
   const app: NestApplication = await NestFactory.create(AppModule, {
@@ -70,7 +71,7 @@ async function bootstrap() {
   }
 
   // Swagger
-  // await swaggerInit(app);
+  await swaggerInit(app);
 
   // Listen
   await app.listen(port, host);
