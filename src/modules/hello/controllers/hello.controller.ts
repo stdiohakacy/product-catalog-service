@@ -1,6 +1,6 @@
-import { HelperDateService } from '@modules/helper/services/helper.date.service';
-import { Response } from '@modules/response/decorators/response.decorator';
-import { IResponse } from '@modules/response/interfaces/response.interface';
+import { HelperDateService } from 'src/common/helper/services/helper.date.service';
+import { Response } from 'src/common/response/decorators/response.decorator';
+import { IResponse } from 'src/common/response/interfaces/response.interface';
 import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { HelloDoc } from 'src/modules/hello/docs/hello.doc';

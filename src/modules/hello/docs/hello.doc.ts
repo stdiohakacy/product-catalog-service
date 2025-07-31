@@ -2,7 +2,7 @@ import {
   Doc,
   DocAuth,
   DocResponse,
-} from '@modules/doc/decorators/doc.decorator';
+} from 'src/common/doc/decorators/doc.decorator';
 import { applyDecorators } from '@nestjs/common';
 
 import { HelloResponseDto } from 'src/modules/hello/dtos/response/hello.response.dto';
@@ -12,7 +12,7 @@ export function HelloDoc(): MethodDecorator {
     Doc({
       summary: 'hello test api',
     }),
-    DocResponse<HelloResponseDto>('app.hello', {
+    DocResponse<HelloResponseDto>('hello.hello', {
       dto: HelloResponseDto,
     }),
   );

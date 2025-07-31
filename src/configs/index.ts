@@ -8,6 +8,7 @@ import EmailConfig from 'src/configs/email.config';
 import DebugConfig from 'src/configs/debug.config';
 import HomeConfig from 'src/configs/home.config';
 import RedisConfig from 'src/configs/redis.config';
+import MessageConfig from 'src/configs/message.config';
 
 export default [
   AppConfig,
@@ -20,4 +21,5 @@ export default [
   DebugConfig,
   HomeConfig,
   RedisConfig,
+  MessageConfig,
 ];

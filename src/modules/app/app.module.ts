@@ -5,13 +5,14 @@ import { typeormConfig } from '../product-catalog/infrastructure/persistence/typ
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configs from 'src/configs';
 import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
-import { LoggerOptionModule } from '@modules/logger/logger.option.module';
-import { LoggerOptionService } from '@modules/logger/services/logger.option.service';
-import { HelperModule } from '@modules/helper/helper.module';
-import { RequestModule } from '@modules/request/request.module';
+import { LoggerOptionModule } from 'src/common/logger/logger.option.module';
+import { LoggerOptionService } from 'src/common/logger/services/logger.option.service';
+import { HelperModule } from 'src/common/helper/helper.module';
+import { RequestModule } from 'src/common/request/request.module';
 import { HelloModule } from '@modules/hello/hello.module';
 import { CacheModule, CacheOptions } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
+import { MessageModule } from 'src/common/message/message.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import KeyvRedis from '@keyv/redis';
 
     HelperModule.forRoot(),
     RequestModule.forRoot(),
+    MessageModule.forRoot(),
     ProductCatalogModule,
     HelloModule,
   ],
