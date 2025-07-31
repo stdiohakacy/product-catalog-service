@@ -6,10 +6,11 @@ import {
 } from '../../../outbound/product.repository.port';
 import { Err, Ok, Result } from 'oxide.ts';
 import { Product } from '@modules/product-catalog/domain/aggregates/product.aggregate';
-import { ConflictException, ExceptionBase } from '@libs/exceptions';
+import { ExceptionBase } from '@libs/exceptions';
 import { Inject } from '@nestjs/common';
 import { ProductCategory } from '@modules/product-catalog/domain/value-objects/product-category.vo';
 import { ProductId } from '@modules/product-catalog/domain/value-objects/product-id.vo';
+import { ProductAlreadyExistsError } from '@modules/product-catalog/domain/entities/product.error';
 
 @CommandHandler(AddProductCommand)
 export class AddProductHandler
@@ -36,9 +37,7 @@ export class AddProductHandler
     if (existed.isErr()) return existed;
 
     if (existed.unwrap().isSome()) {
-      return Err(
-        new ConflictException(`Product with name '${name}' already exists.`),
-      );
+      return Err(new ProductAlreadyExistsError());
     }
 
     const product = Product.create({

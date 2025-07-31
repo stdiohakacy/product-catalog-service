@@ -12,6 +12,7 @@ import { Product } from '../../domain/aggregates/product.aggregate';
 import { ExceptionBase } from '@libs/exceptions';
 import { CreateProductDto } from './dtos/create-product.request.dto';
 import { ProductResponseMapper } from './mappers/product-response.mapper';
+import { DomainToRestErrorMapper } from './mappers/error.mapper';
 
 @Controller('products')
 export class ProductController {
@@ -28,15 +29,8 @@ export class ProductController {
       Ok: (product: Product) => {
         return ProductResponseMapper.toResponse(product);
       },
-      Err: (error: ExceptionBase) => {
-        throw new HttpException(
-          {
-            message: error.message,
-            code: error.code,
-            metadata: error.metadata,
-          },
-          HttpStatus.CONFLICT,
-        );
+      Err: (error: Error) => {
+        throw DomainToRestErrorMapper.map(error);
       },
     });
   }
