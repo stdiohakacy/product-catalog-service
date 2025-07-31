@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -9,7 +11,7 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -19,7 +21,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@libs/*": ["src/libs/*"],
-      "@modules/*": ["src/modules/*"],
+      "@modules/*": ["src/modules/*"]
     }
   }
 }
