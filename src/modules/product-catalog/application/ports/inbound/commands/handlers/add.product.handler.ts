@@ -36,6 +36,7 @@ export class AddProductHandler
 
     const product = Product.create({
       id: ProductId.generate().getValue(),
+      createdBy: '06440f05-a84b-49ee-bf25-4ff899b456a2',
       props: {
         name: command.name,
         description: command.description,

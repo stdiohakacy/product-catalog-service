@@ -45,6 +45,10 @@ export class ProductMapper implements MapperInterface<Product, ProductEntity> {
     orm.id = aggregate.id;
     orm.createdDate = aggregate.createdAt;
     orm.updatedDate = aggregate.updatedAt;
+    orm.createdUserId = aggregate.createdBy;
+    orm.updatedUserId = aggregate.updatedBy;
+    orm.deletedDate = aggregate.deletedAt;
+    orm.deletedUserId = aggregate.deletedBy;
 
     orm.name = props.name;
     orm.description = props.description;
