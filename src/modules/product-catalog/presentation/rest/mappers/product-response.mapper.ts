@@ -6,7 +6,7 @@ export class ProductResponseMapper {
     const props = product.getProps();
 
     return {
-      id: product.id,
+      id: product.id.getValue(),
       name: props.name,
       description: props.description,
       imageUrls: props.imageUrls,

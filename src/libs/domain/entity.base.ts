@@ -1,3 +1,4 @@
+import { UniqueEntityID } from './unique-entity-id';
 import {
   ArgumentInvalidException,
   ArgumentNotProvidedException,
@@ -6,8 +7,6 @@ import {
 import { Guard } from '@libs/patterns';
 import { convertPropsToObject } from '@libs/utils';
 
-export type AggregateId = string;
-
 export interface BaseEntityAudit {
   createdBy?: string;
   updatedBy?: string;
@@ -15,14 +14,15 @@ export interface BaseEntityAudit {
   deletedBy?: string;
 }
 
-export interface BaseEntityProps extends BaseEntityAudit {
-  id: AggregateId;
+export interface BaseEntityProps<ID extends string | number>
+  extends BaseEntityAudit {
+  id: UniqueEntityID<ID>;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface CreateEntityProps<T> {
-  id: AggregateId;
+export interface CreateEntityProps<T, ID extends string | number = string> {
+  id: UniqueEntityID<ID>;
   props: T;
   createdAt?: Date;
   updatedAt?: Date;
@@ -32,7 +32,19 @@ export interface CreateEntityProps<T> {
   deletedBy?: string;
 }
 
-export abstract class BaseEntity<EntityProps> {
+export abstract class BaseEntity<
+  EntityProps,
+  ID extends string | number = string,
+> {
+  protected readonly props: EntityProps;
+  protected _id: UniqueEntityID<ID>;
+  private readonly _createdAt: Date;
+  private _updatedAt: Date;
+  private _createdBy?: string;
+  private _updatedBy?: string;
+  private _deletedAt?: Date;
+  private _deletedBy?: string;
+
   constructor({
     id,
     createdAt,
@@ -42,14 +54,13 @@ export abstract class BaseEntity<EntityProps> {
     deletedAt,
     deletedBy,
     props,
-  }: CreateEntityProps<EntityProps>) {
-    this.setId(id);
+  }: CreateEntityProps<EntityProps, ID>) {
+    this._id = id;
     this.validateProps(props);
 
     const now = new Date();
     this._createdAt = createdAt || now;
     this._updatedAt = updatedAt || now;
-
     this._createdBy = createdBy;
     this._updatedBy = updatedBy;
     this._deletedAt = deletedAt;
@@ -59,20 +70,7 @@ export abstract class BaseEntity<EntityProps> {
     this.validate();
   }
 
-  protected readonly props: EntityProps;
-
-  protected abstract _id: AggregateId;
-
-  private readonly _createdAt: Date;
-  private _updatedAt: Date;
-
-  private _createdBy?: string;
-  private _updatedBy?: string;
-
-  private _deletedAt?: Date;
-  private _deletedBy?: string;
-
-  get id(): AggregateId {
+  get id(): UniqueEntityID<ID> {
     return this._id;
   }
 
@@ -114,11 +112,7 @@ export abstract class BaseEntity<EntityProps> {
     if (userId) this._deletedBy = userId;
   }
 
-  private setId(id: AggregateId): void {
-    this._id = id;
-  }
-
-  public getProps(): EntityProps & BaseEntityProps {
+  public getProps(): EntityProps & BaseEntityProps<ID> {
     return Object.freeze({
       id: this._id,
       createdAt: this._createdAt,
@@ -133,7 +127,7 @@ export abstract class BaseEntity<EntityProps> {
 
   public toObject(): unknown {
     return Object.freeze({
-      id: this._id,
+      id: this._id.getValue(),
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
       createdBy: this._createdBy,
@@ -146,54 +140,38 @@ export abstract class BaseEntity<EntityProps> {
 
   public getSnapshot(): {
     entityType: string;
-    entityId: AggregateId;
-    data: EntityProps & BaseEntityProps;
+    entityId: UniqueEntityID<ID>;
+    data: EntityProps & BaseEntityProps<ID>;
     timestamp: Date;
   } {
     return {
       entityType: this.constructor.name,
-      entityId: this.id,
+      entityId: this._id,
       data: this.getProps(),
       timestamp: new Date(),
     };
   }
 
-  public equals(object?: BaseEntity<EntityProps>): boolean {
-    if (!object) return false;
-    if (this === object) return true;
-    if (!BaseEntity.isEntity(object)) return false;
-    return this.id === object.id;
-  }
-
-  public static isEntity(entity: unknown): entity is BaseEntity<unknown> {
-    return entity instanceof BaseEntity;
-  }
-
   public abstract validate(): void;
 
   private validateProps(props: EntityProps): void {
-    const MAX_PROPS = 50;
-
     if (Guard.isEmpty(props)) {
-      throw new ArgumentNotProvidedException(
-        'BaseEntity props should not be empty',
-      );
+      throw new ArgumentNotProvidedException('Props should not be empty');
     }
 
     if (typeof props !== 'object') {
-      throw new ArgumentInvalidException(
-        'BaseEntity props should be an object',
-      );
+      throw new ArgumentInvalidException('Props should be an object');
     }
 
+    const MAX_PROPS = 50;
     if (Object.keys(props as any).length > MAX_PROPS) {
       throw new ArgumentOutOfRangeException(
-        `BaseEntity props should not have more than ${MAX_PROPS} properties`,
+        `Props should not have more than ${MAX_PROPS} properties`,
       );
     }
   }
 
   public toString(): string {
-    return `${this.constructor.name}<${this.id}>`;
+    return `${this.constructor.name}<${this._id.getValue()}>`;
   }
 }

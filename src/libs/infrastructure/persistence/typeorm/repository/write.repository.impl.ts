@@ -53,7 +53,7 @@ export abstract class WriteRepositoryImpl<
     }
 
     try {
-      const result = await this.repository.delete(entity.id);
+      const result = await this.repository.delete(entity.id.getValue());
       return Ok(result.affected !== 0);
     } catch (error) {
       return Err(

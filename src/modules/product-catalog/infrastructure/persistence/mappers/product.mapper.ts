@@ -4,12 +4,13 @@ import { Product } from '@modules/product-catalog/domain/aggregates/product.aggr
 import { ProductEntity } from '../typeorm/entities/product.entity';
 import { ProductCategory } from '@modules/product-catalog/domain/value-objects/product-category.vo';
 import { ProductReview } from '@modules/product-catalog/domain/value-objects/product-review.vo';
+import { ProductId } from '@modules/product-catalog/domain/value-objects/product-id.vo';
 
 @Injectable()
 export class ProductMapper implements MapperInterface<Product, ProductEntity> {
   toDomain(entity: ProductEntity): Product {
     return Product.create({
-      id: entity.id,
+      id: new ProductId(entity.id),
       createdAt: entity.createdDate,
       createdBy: entity.createdUserId,
       updatedAt: entity.updatedDate,
@@ -42,7 +43,7 @@ export class ProductMapper implements MapperInterface<Product, ProductEntity> {
     const props = aggregate.getProps();
 
     const orm = new ProductEntity();
-    orm.id = aggregate.id;
+    orm.id = aggregate.id.getValue();
     orm.createdDate = aggregate.createdAt;
     orm.updatedDate = aggregate.updatedAt;
     orm.createdUserId = aggregate.createdBy;

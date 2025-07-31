@@ -1,4 +1,5 @@
-import { BaseAggregateRoot, CreateEntityProps } from '@libs/domain';
+import { BaseEntity, CreateEntityProps } from '@libs/domain';
+import { UniqueEntityID } from '@libs/domain/unique-entity-id';
 import { ProductCategory } from '../value-objects/product-category.vo';
 import {
   ProductReview,
@@ -21,22 +22,17 @@ export interface ProductProps {
   reviews?: ProductReview[];
 }
 
-export class Product extends BaseAggregateRoot<ProductProps> {
-  protected _id: string;
+export class Product extends BaseEntity<ProductProps> {
+  protected _id: UniqueEntityID<string>;
 
-  constructor(props: CreateEntityProps<ProductProps>) {
+  constructor(props: CreateEntityProps<ProductProps, string>) {
     super(props);
   }
 
-  public static create(entityProps?: CreateEntityProps<ProductProps>): Product {
-    if (!entityProps) {
-      throw new ArgumentInvalidException(
-        'Entity props with id are required to create a Product',
-      );
-    }
-    const product = new Product(entityProps);
-    product.validate();
-    return product;
+  public static create(
+    props: CreateEntityProps<ProductProps, string>,
+  ): Product {
+    return new Product(props);
   }
 
   validate(): void {
@@ -54,7 +50,7 @@ export class Product extends BaseAggregateRoot<ProductProps> {
       throw new ArgumentOutOfRangeException('Product price must be >= 0');
     }
 
-    if (imageUrls && imageUrls.some((url) => Guard.isEmpty(url))) {
+    if (imageUrls?.some((url) => Guard.isEmpty(url))) {
       throw new DomainInvalidException('Image URL cannot be empty');
     }
 
@@ -74,7 +70,7 @@ export class Product extends BaseAggregateRoot<ProductProps> {
 
   public addReview(reviewProps: ProductReviewProps): void {
     const review = ProductReview.create(reviewProps);
-    this.props.reviews = [...this.props.reviews, review];
+    this.props.reviews = [...(this.props.reviews ?? []), review];
     this.markUpdated();
   }
 
