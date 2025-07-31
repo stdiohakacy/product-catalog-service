@@ -49,18 +49,15 @@ export class ProductMapper implements MapperInterface<Product, ProductEntity> {
     orm.updatedUserId = aggregate.updatedBy;
     orm.deletedDate = aggregate.deletedAt;
     orm.deletedUserId = aggregate.deletedBy;
-
     orm.name = props.name;
     orm.description = props.description;
     orm.imageUrls = props.imageUrls;
     orm.price = props.price;
     orm.availableItemCount = props.availableItemCount;
-
     orm.category = {
       name: props.category.getName(),
       description: props.category.getDescription(),
     };
-
     orm.reviews = (props.reviews ?? []).map((review) => ({
       userId: review.getUserId(),
       rating: review.getRating(),

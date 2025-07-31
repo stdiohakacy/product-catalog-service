@@ -75,8 +75,6 @@ export abstract class BaseRepositoryImpl<
         ? entity.map((e) => this.mapper.toPersistence(e))
         : [this.mapper.toPersistence(entity)];
 
-      console.log(ormEntities);
-
       await this.repository.save(ormEntities);
       return Ok(Void);
     } catch (error) {

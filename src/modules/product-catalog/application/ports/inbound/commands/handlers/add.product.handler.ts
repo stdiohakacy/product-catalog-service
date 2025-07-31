@@ -23,14 +23,21 @@ export class AddProductHandler
   async execute(
     command: AddProductCommand,
   ): Promise<Result<Product, ExceptionBase>> {
-    const existed = await this.productRepository.findByName(command.name);
+    const { props } = command;
+    const {
+      name,
+      description,
+      imageUrls,
+      price,
+      availableItemCount,
+      category,
+    } = props;
+    const existed = await this.productRepository.findByName(name);
     if (existed.isErr()) return existed;
 
     if (existed.unwrap().isSome()) {
       return Err(
-        new ConflictException(
-          `Product with name '${command.name}' already exists.`,
-        ),
+        new ConflictException(`Product with name '${name}' already exists.`),
       );
     }
 
@@ -38,12 +45,12 @@ export class AddProductHandler
       id: ProductId.generate().getValue(),
       createdBy: '06440f05-a84b-49ee-bf25-4ff899b456a2',
       props: {
-        name: command.name,
-        description: command.description,
-        imageUrls: command.imageUrls,
-        price: command.price,
-        availableItemCount: command.availableItemCount,
-        category: new ProductCategory(command.category),
+        name,
+        description,
+        imageUrls,
+        price,
+        availableItemCount,
+        category: new ProductCategory(category),
       },
     });
 
