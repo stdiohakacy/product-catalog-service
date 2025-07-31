@@ -10,7 +10,7 @@ import { ExceptionBase } from '@libs/exceptions';
 import { Inject } from '@nestjs/common';
 import { ProductCategory } from '@modules/product-catalog/domain/value-objects/product-category.vo';
 import { ProductId } from '@modules/product-catalog/domain/value-objects/product-id.vo';
-import { ProductAlreadyExistsError } from '@modules/product-catalog/domain/entities/product.error';
+import { ProductAlreadyExistsError } from '@modules/product-catalog/domain/errors/product.error';
 
 @CommandHandler(AddProductCommand)
 export class AddProductHandler

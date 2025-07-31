@@ -1,6 +1,6 @@
 import { ExceptionBase, INTERNAL_SERVER_ERROR } from '@libs/exceptions';
-import { ProductAlreadyExistsError } from '@modules/product-catalog/domain/entities/product.error';
-import { PRODUCT_ALREADY_EXISTS } from '@modules/product-catalog/domain/errors/product-catalog.error';
+import { ProductAlreadyExistsError } from '@modules/product-catalog/domain/errors/product.error';
+import { PRODUCT_ALREADY_EXISTS } from '@modules/product-catalog/domain/errors/errors.code';
 import {
   HttpException,
   ConflictException,
