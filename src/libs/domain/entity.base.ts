@@ -8,7 +8,14 @@ import { convertPropsToObject } from '@libs/utils';
 
 export type AggregateId = string;
 
-export interface BaseEntityProps {
+export interface BaseEntityAudit {
+  createdBy?: string;
+  updatedBy?: string;
+  deletedAt?: Date;
+  deletedBy?: string;
+}
+
+export interface BaseEntityProps extends BaseEntityAudit {
   id: AggregateId;
   createdAt: Date;
   updatedAt: Date;
@@ -19,6 +26,10 @@ export interface CreateEntityProps<T> {
   props: T;
   createdAt?: Date;
   updatedAt?: Date;
+  createdBy?: string;
+  updatedBy?: string;
+  deletedAt?: Date;
+  deletedBy?: string;
 }
 
 export abstract class BaseEntity<EntityProps> {
@@ -26,37 +37,43 @@ export abstract class BaseEntity<EntityProps> {
     id,
     createdAt,
     updatedAt,
+    createdBy,
+    updatedBy,
+    deletedAt,
+    deletedBy,
     props,
   }: CreateEntityProps<EntityProps>) {
     this.setId(id);
     this.validateProps(props);
+
     const now = new Date();
     this._createdAt = createdAt || now;
     this._updatedAt = updatedAt || now;
+
+    this._createdBy = createdBy;
+    this._updatedBy = updatedBy;
+    this._deletedAt = deletedAt;
+    this._deletedBy = deletedBy;
+
     this.props = props;
     this.validate();
   }
 
   protected readonly props: EntityProps;
 
-  /**
-   * ID is set in the concrete entity implementation to support
-   * different ID types depending on your needs.
-   * For example it could be a UUID for aggregate root,
-   * and shortid / nanoid for child entities.
-   */
   protected abstract _id: AggregateId;
 
   private readonly _createdAt: Date;
-
   private _updatedAt: Date;
+
+  private _createdBy?: string;
+  private _updatedBy?: string;
+
+  private _deletedAt?: Date;
+  private _deletedBy?: string;
 
   get id(): AggregateId {
     return this._id;
-  }
-
-  private setId(id: AggregateId): void {
-    this._id = id;
   }
 
   get createdAt(): Date {
@@ -67,60 +84,64 @@ export abstract class BaseEntity<EntityProps> {
     return this._updatedAt;
   }
 
-  static isEntity(entity: unknown): entity is BaseEntity<unknown> {
-    return entity instanceof BaseEntity;
+  get createdBy(): string | undefined {
+    return this._createdBy;
   }
 
-  /**
-   *  Checks if two entities are the same BaseEntity by comparing ID field.
-   * @param object BaseEntity
-   */
-  public equals(object?: BaseEntity<EntityProps>): boolean {
-    if (object === null || object === undefined) {
-      return false;
-    }
-
-    if (this === object) {
-      return true;
-    }
-
-    if (!BaseEntity.isEntity(object)) {
-      return false;
-    }
-
-    return this.id ? this.id === object.id : false;
+  get updatedBy(): string | undefined {
+    return this._updatedBy;
   }
 
-  /**
-   * Returns entity properties.
-   * @return {*}  {Props & EntityProps}
-   * @memberof BaseEntity
-   */
+  get deletedAt(): Date | undefined {
+    return this._deletedAt;
+  }
+
+  get deletedBy(): string | undefined {
+    return this._deletedBy;
+  }
+
+  get isDeleted(): boolean {
+    return !!this._deletedAt;
+  }
+
+  protected markUpdated(userId?: string): void {
+    this._updatedAt = new Date();
+    if (userId) this._updatedBy = userId;
+  }
+
+  protected markDeleted(userId?: string): void {
+    this._deletedAt = new Date();
+    if (userId) this._deletedBy = userId;
+  }
+
+  private setId(id: AggregateId): void {
+    this._id = id;
+  }
+
   public getProps(): EntityProps & BaseEntityProps {
-    const propsCopy = {
+    return Object.freeze({
       id: this._id,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
+      createdBy: this._createdBy,
+      updatedBy: this._updatedBy,
+      deletedAt: this._deletedAt,
+      deletedBy: this._deletedBy,
       ...this.props,
-    };
-    return Object.freeze(propsCopy);
+    });
   }
 
-  /**
-   * Convert an BaseEntity and all sub-entities/Value Objects it
-   * contains to a plain object with primitive types. Can be
-   * useful when logging an entity during testing/debugging
-   */
   public toObject(): unknown {
-    const plainProps = convertPropsToObject(this.props);
-
-    const result = {
+    return Object.freeze({
       id: this._id,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
-      ...plainProps,
-    };
-    return Object.freeze(result);
+      createdBy: this._createdBy,
+      updatedBy: this._updatedBy,
+      deletedAt: this._deletedAt,
+      deletedBy: this._deletedBy,
+      ...convertPropsToObject(this.props),
+    });
   }
 
   public getSnapshot(): {
@@ -137,11 +158,17 @@ export abstract class BaseEntity<EntityProps> {
     };
   }
 
-  /**
-   * There are certain rules that always have to be true (invariants)
-   * for each entity. Validate method is called every time before
-   * saving an entity to the database to make sure those rules are respected.
-   */
+  public equals(object?: BaseEntity<EntityProps>): boolean {
+    if (!object) return false;
+    if (this === object) return true;
+    if (!BaseEntity.isEntity(object)) return false;
+    return this.id === object.id;
+  }
+
+  public static isEntity(entity: unknown): entity is BaseEntity<unknown> {
+    return entity instanceof BaseEntity;
+  }
+
   public abstract validate(): void;
 
   private validateProps(props: EntityProps): void {
@@ -152,15 +179,21 @@ export abstract class BaseEntity<EntityProps> {
         'BaseEntity props should not be empty',
       );
     }
+
     if (typeof props !== 'object') {
       throw new ArgumentInvalidException(
         'BaseEntity props should be an object',
       );
     }
+
     if (Object.keys(props as any).length > MAX_PROPS) {
       throw new ArgumentOutOfRangeException(
         `BaseEntity props should not have more than ${MAX_PROPS} properties`,
       );
     }
+  }
+
+  public toString(): string {
+    return `${this.constructor.name}<${this.id}>`;
   }
 }

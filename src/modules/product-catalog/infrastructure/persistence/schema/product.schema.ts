@@ -4,16 +4,14 @@ export const PRODUCT_SCHEMA = {
   TABLE_NAME: 'products',
   COLUMNS: {
     ...BASE_SCHEMA.COLUMNS,
-    sku: 'sku',
     name: 'name',
-    slug: 'slug',
     description: 'description',
-    categoryId: 'category_id',
-    brandId: 'brand_id',
-    thumbnailUrl: 'thumbnail_url',
-    status: 'status', // draft | active | archived
+    imageUrls: 'image_urls',
+    price: 'price',
+    availableItemCount: 'available_item_count',
+    category: 'category',
+    reviews: 'reviews',
   },
-
   RELATED_ONE: {},
   RELATED_MANY: {},
 };

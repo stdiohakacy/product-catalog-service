@@ -1,27 +1,21 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BrandEntity } from './persistence/typeorm/entities/brand.entity';
-import { CategoryEntity } from './persistence/typeorm/entities/category.entity';
+import { ProductMapper } from './persistence/mappers/product.mapper';
+import { ProductRepositoryAdapter } from './persistence/repository/product.repository.adapter';
+import { PRODUCT_REPOSITORY_PORT } from '../application/ports/outbound/product.repository.port';
 import { ProductEntity } from './persistence/typeorm/entities/product.entity';
-import { ProductVariantEntity } from './persistence/typeorm/entities/product-variant.entity';
-import { ProductImageEntity } from './persistence/typeorm/entities/product-image.entity';
-import { ProductAttributeEntity } from './persistence/typeorm/entities/product-attribute.entity';
-import { ProductAttributeTemplateEntity } from './persistence/typeorm/entities/product-attribute-template.entity';
-import { ProductAttributeTemplateValueEntity } from './persistence/typeorm/entities/product-attribute-template-value.entity';
+
+const providers = [
+  ProductMapper,
+  {
+    provide: PRODUCT_REPOSITORY_PORT,
+    useClass: ProductRepositoryAdapter,
+  },
+];
+
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      BrandEntity,
-      CategoryEntity,
-      ProductEntity,
-      ProductVariantEntity,
-      ProductImageEntity,
-      ProductAttributeEntity,
-      ProductAttributeTemplateEntity,
-      ProductAttributeTemplateValueEntity,
-    ]),
-  ],
-  providers: [],
-  exports: [TypeOrmModule],
+  imports: [TypeOrmModule.forFeature([ProductEntity])],
+  providers,
+  exports: [...providers],
 })
 export class InfrastructureModule {}
