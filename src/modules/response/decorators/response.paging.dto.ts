@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { ENUM_PAGINATION_ORDER_DIRECTION_TYPE } from '@modules/pagination/enums/pagination.enum';
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { ResponseDto, ResponseMetadataDto } from './response.dto';
+import { ResponseDto, ResponseMetadataDto } from '../dtos/response.dto';
 import { PAGINATION_DEFAULT_AVAILABLE_ORDER_DIRECTION } from '@modules/pagination/constants/pagination.constant';
 
 export class ResponsePagingMetadataPaginationRequestDto {

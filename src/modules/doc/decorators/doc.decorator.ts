@@ -31,7 +31,7 @@ import { ENUM_AUTH_STATUS_CODE_ERROR } from '@modules/auth/enums/auth.status-cod
 import { ENUM_PAGINATION_ORDER_DIRECTION_TYPE } from '@modules/pagination/enums/pagination.enum';
 import { ENUM_FILE_MIME } from '@modules/file/enums/file.enum';
 import { ResponseDto } from '@modules/response/dtos/response.dto';
-import { ResponsePagingDto } from '@modules/response/dtos/response.paging.dto';
+import { ResponsePagingDto } from '@modules/response/decorators/response.paging.dto';
 
 export function DocDefault<T>(options: IDocDefaultOptions<T>): MethodDecorator {
   const docs = [];

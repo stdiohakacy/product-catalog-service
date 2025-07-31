@@ -1,12 +1,9 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 
 export class ResponseMetadataDto {
-  language: string;
   timestamp: number;
   timezone: string;
   path: string;
-  version: string;
-  repoVersion: string;
   [key: string]: any;
 }
 
@@ -35,12 +32,9 @@ export class ResponseDto {
     description: 'Contain metadata about API',
     type: ResponseMetadataDto,
     example: {
-      language: 'en',
       timestamp: 1660190937231,
       timezone: 'Asia/Dubai',
       path: '/api/v1/test/hello',
-      version: '1',
-      repoVersion: '1.0.0',
     },
   })
   _metadata: ResponseMetadataDto;

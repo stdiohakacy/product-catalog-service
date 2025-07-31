@@ -10,8 +10,32 @@ services:
       POSTGRES_DB: product_catalog_db
     ports:
       - '5432:5432'
+    networks:
+      - product-svc-network
     volumes:
       - product_catalog_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    restart: on-failure
+    ports:
+      - '6379:6379'
+    volumes:
+      - product_catalog_cache_data:/data
+    networks:
+      - product-svc-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 30s
+      retries: 5
+
 volumes:
   product_catalog_data:
+  product_catalog_cache_data:
+
+networks:
+  product-svc-network:
+    driver: bridge
